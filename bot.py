@@ -72,6 +72,7 @@ class Bot:
         user_id = str(event.message.peer_id)
         text = event.message.text
         state = UserState.get(user_id=user_id)
+
         self.search_intent(text, user_id, state)
 
     def send_text(self, text_to_send, user_id):
@@ -129,6 +130,7 @@ class Bot:
         self.send_step(step, user_id, context={})
         UserState(user_id=user_id, scenario_name=scenario_name, step_name=first_step, context={})
 
+
     def continue_scenario(self, text, state, user_id):
         steps = settings.SCENARIOS[state.scenario_name]['steps']
         step = steps[state.step_name]
@@ -154,7 +156,7 @@ class Bot:
                 )
                 log.info('Забронированы билеты из города {From} в город {to} на {date}'.format(**state.context))
                 state.delete()
-        elif not state.do_continue:
+        elif 'continue' in state.context:
             # failure finish
             text_to_send = step['finish'].format(**state.context)
             self.send_text(text_to_send, user_id)
